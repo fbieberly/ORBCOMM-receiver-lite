@@ -34,11 +34,12 @@ I use [liquid-dsp] for the signal processing.
 1. Update the orbcomm.txt TLE file from Celestrak.
     1. Run: ```wget -N https://www.celestrak.com/NORAD/elements/orbcomm.txt``` in the orbcomm_liquid folder.
 2. Update latitude, longitude, altitude and minimum horizon of your receiver in _config.h_
-3. Run _rtl_sdr -s 1228800 -g 0 -f 137500000 - | ./orbcomm_decoder_
+3. Run ```rtl_sdr -s 1228800 -g 0 -f 137500000 - | ./orbcomm_decoder```
     1. I recommend you use [gPredict] to know where the ORBCOMM satellites are.
     1. Note that not all the ORBCOMM satellites still transmit.
     1. All the decoded packets are printed to STDOUT. Pipe it to a file or consume it with another program if you want to save the data.  
   
+[gPredict]: https://github.com/csete/gpredict
 
 ## References
 
