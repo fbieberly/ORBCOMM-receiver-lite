@@ -1,4 +1,4 @@
-// gcc -o ./orbcomm_decoder ./orbcomm_decoder.c ./SGP4.c ./TLE.c ./eci2aer.c -lm -lliquid -O2
+// gcc -I ./src -o ./orbcomm_decoder ./src/orbcomm_decoder.c ./src/SGP4.c ./src/TLE.c ./src/eci2aer.c -lm -lliquid -Isrc -O2
 
 #include <stdio.h>
 #include <unistd.h>
@@ -15,7 +15,7 @@
 // Files I made
 #include "orbcomm_db.h"
 #include "eci2aer.h"
-#include "config.h"
+#include "../config.h"
 
 // Constants
 #define C 299792458.0
