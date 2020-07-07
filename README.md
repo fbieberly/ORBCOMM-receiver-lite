@@ -28,7 +28,7 @@ I use [liquid-dsp] for the signal processing.
 1. Install librtlsdr
 2. Install liquid-dsp
 3. Build this project
-    1. ```gcc -o ./orbcomm_decoder ./orbcomm_decoder.c ./SGP4.c ./TLE.c ./eci2aer.c -lm -lliquid -O2```
+    1. ```gcc -I ./src -o ./orbcomm_decoder ./src/orbcomm_decoder.c ./src/SGP4.c ./src/TLE.c ./src/eci2aer.c -lm -lliquid -Isrc -O2```
 
 ## Real-time decoding
 1. Update the orbcomm.txt TLE file from Celestrak.
@@ -40,6 +40,10 @@ I use [liquid-dsp] for the signal processing.
     1. All the decoded packets are printed to STDOUT. Pipe it to a file or consume it with another program if you want to save the data.  
   
 [gPredict]: https://github.com/csete/gpredict
+
+## Output  
+
+  
 
 ## References
 
