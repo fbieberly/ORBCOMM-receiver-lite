@@ -28,7 +28,7 @@ I use [liquid-dsp] for the signal processing.
 1. Install librtlsdr
 2. Install liquid-dsp
 3. Build this project
-    1. ```gcc -I ./src -o ./orbcomm_decoder ./src/orbcomm_decoder.c ./src/SGP4.c ./src/TLE.c ./src/eci2aer.c -lm -lliquid -Isrc -O2```
+    1. ```gcc -o ./orbcomm_decoder ./src/orbcomm_decoder.c ./src/SGP4.c ./src/TLE.c ./src/eci2aer.c -lm -lliquid -Isrc -O2```
 
 ## Real-time decoding
 1. Update the orbcomm.txt TLE file from Celestrak.
