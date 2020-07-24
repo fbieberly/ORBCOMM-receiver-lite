@@ -7,7 +7,6 @@
 #include <string.h>
 #include <math.h>
 
-// headers from someone else
 #include <liquid/liquid.h>
 
 // Constants
@@ -20,17 +19,20 @@ int main(void)
     uint8_t *data_buffer = (uint8_t *) malloc(chunk_size);
 
     // decimating LPF parameters
-    float fc = 0.5;
-    float ft = fc;
+    float ft = 0.5;
     float As = 40.0f;
     float mu = 0.0f;
     unsigned int lpf_h_len = estimate_req_filter_len(ft, As);
-    float lpf_h[lpf_h_len];                   // filter coefficients
+    float lpf_h[lpf_h_len];
+
+    // create taps for fir low pass filter
     liquid_firdes_kaiser(lpf_h_len, fc, As, mu, lpf_h);
 
+    // create liquid decimating low pass filter object
     firdecim_crcf decim_lpf_q = firdecim_crcf_create(DECIM, lpf_h, lpf_h_len);
     firdecim_crcf_set_scale(decim_lpf_q, 1.0f/DECIM);
 
+    // buffers for samples
     float complex samples[chunk_size/2];
     float complex decim_samples[chunk_size/4];
 
