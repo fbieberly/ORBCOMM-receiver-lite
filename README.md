@@ -48,7 +48,7 @@ I use [liquid-dsp] for the signal processing.
 Here is the output of the program:  
 Note: the ### on the line means that packet does not pass the checksum OR has an unrecognized header.  
 ```
-gh@gh-laptop:~/ORBCOMM-receiver-lite/src (dev *%)$ rtl_sdr -s 1200000 -g 0 -f 137524000 - | ./decimator | ./orbcomm_decoder 
+me@laptop:~/ORBCOMM-receiver-lite/src $ rtl_sdr -s 1200000 -g 0 -f 137524000 - | ./decimator | ./orbcomm_decoder 
 Len of orbcomm_sats: 11
 Found 1 device(s):
 New Satellite FM116, Elevation:  6.9, Doppler: 1087.9 Hz
