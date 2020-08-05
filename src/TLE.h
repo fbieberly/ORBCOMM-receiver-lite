@@ -10,7 +10,7 @@ typedef struct TLE {
     char line2[70];
     char intlid[12];
     int objectNum;
-    long epoch;
+    long long epoch;
     double ndot;
     double nddot;
     double bstar;

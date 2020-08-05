@@ -156,8 +156,8 @@ long parseEpoch(ElsetRec *rec, char *str)
     double diff2 = 86400000.0*rec->jdsatepochF;
     diff*=86400000.0;
 
-    long epoch = (long)diff2;
-    epoch+=(long)diff;
+    long long epoch = (long long)diff2;
+    epoch+=(long long)diff;
     return epoch;
 }
 
