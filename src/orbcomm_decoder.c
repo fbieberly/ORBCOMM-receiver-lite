@@ -165,7 +165,7 @@ int main(void)
              &jd, &jdf);
 
         found_sat = 0;
-        double rawtime_increase = (rawtime + time_increase)*1000.0;
+        double rawtime_increase = ((float)rawtime + time_increase)*1000.0;
         for (int j = 0; j < num_sats; ++j)
         {
             parseLines(&tle, orbcomm_sats[j].line1, orbcomm_sats[j].line2);
