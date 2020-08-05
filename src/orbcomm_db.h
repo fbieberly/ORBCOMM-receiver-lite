@@ -1,9 +1,11 @@
 
+
 // Two decoders per satellite. One for each channel.
 typedef struct ORBCOMM_DECODER{
     nco_crcf nco_q;
-    firdecim_crcf decim_lpf_q;
+    symtrack_cccf symtrack_q;
     symsync_crcf symsync_q;
+    firdecim_cccf firdecim_q;
     uint8_t bits[2000];
     int bits_start;
     int bits_stop;
@@ -19,6 +21,7 @@ typedef struct SAT_INFO {
     char line1[255];
     char line2[255];
     float channel[2];
+    float offset[2];
     float doppler;
     ORBCOMM_DECODER decoder[2];
     uint8_t overhead;
@@ -27,47 +30,58 @@ typedef struct SAT_INFO {
 SAT_INFO orbcomm_sats[] = {
     { .sat_name = "FM103",
      .channel[0] = 137250000.0,
-     .channel[1] = 137312500.0},
+     .channel[1] = 137312500.0
+    },
 
     { .sat_name = "FM107",
      .channel[0] = 137250000.0,
-     .channel[1] = 137312500.0},
+     .channel[1] = 137312500.0
+    },
 
     { .sat_name = "FM108",
      .channel[0] = 137460000.0,
-     .channel[1] = 137712500.0},
+     .channel[1] = 137712500.0
+    },
 
     { .sat_name = "FM109",
      .channel[0] = 137250000.0,
-     .channel[1] = 137312500.0},
+     .channel[1] = 137312500.0
+    },
 
     { .sat_name = "FM110",
      .channel[0] = 137287500.0,
-     .channel[1] = 137737500.0},
+     .channel[1] = 137737500.0
+    },
 
     { .sat_name = "FM112",
      .channel[0] = 137662500.0,
-     .channel[1] = 137800000.0},
+     .channel[1] = 137800000.0
+    },
 
     { .sat_name = "FM113",
      .channel[0] = 137662500.0,
-     .channel[1] = 137800000.0},
+     .channel[1] = 137800000.0
+    },
 
     { .sat_name = "FM114",
      .channel[0] = 137287500.0,
-     .channel[1] = 137737500.0},
+     .channel[1] = 137737500.0
+    },
 
     { .sat_name = "FM116",
      .channel[0] = 137662500.0,
-     .channel[1] = 137800000.0},
+     .channel[1] = 137800000.0
+    },
 
     { .sat_name = "FM117",
      .channel[0] = 137460000.0,
-     .channel[1] = 137712500.0},
+     .channel[1] = 137712500.0
+    },
 
     { .sat_name = "FM118",
      .channel[0] = 137287500.0,
-     .channel[1] = 137737500.0},
+     .channel[1] = 137737500.0
+    },
 };
 
 int packet_headers[] = {
