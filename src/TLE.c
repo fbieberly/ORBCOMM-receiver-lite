@@ -85,7 +85,7 @@ bool isLeap(int year)
     return TRUE;
 }
 
-long parseEpoch(ElsetRec *rec, char *str)
+long long parseEpoch(ElsetRec *rec, char *str)
 {
     char tmp[16];
     strncpy(tmp,str,14);
