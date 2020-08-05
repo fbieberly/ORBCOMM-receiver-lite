@@ -53,7 +53,7 @@ int main(void)
     printf("Len of orbcomm_sats: %d\n", num_sats);
 
     // Open TLE file and fill in data into struct
-    tle_file = fopen("../orbcomm.txt","r");
+    tle_file = fopen("./orbcomm.txt","r");
     for (int i = 0; i < num_sats; ++i)
     {
         char sat_name[255];
@@ -203,7 +203,7 @@ int main(void)
                 }
             } else {
                 if (orbcomm_sats[j].overhead == 1){
-                    // printf("Satellite %s now below horizon.\n", orbcomm_sats[j].sat_name);
+                    printf("Satellite %s now below horizon.\n", orbcomm_sats[j].sat_name);
                     // for (int k = 0; k < 2; ++k){
                     //     nco_crcf_destroy(orbcomm_sats[j].decoder[k].nco_q);
                     //     firdecim_cccf_destroy(orbcomm_sats[j].decoder[k].firdecim_q);

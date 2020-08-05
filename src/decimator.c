@@ -1,4 +1,4 @@
-// gcc -g -o ./decimator ./src/decimator.c -lm -lliquid -O2
+// gcc -o ./decimator ./src/decimator.c -lm -lliquid -O2
 
 #include <stdio.h>
 #include <unistd.h>
