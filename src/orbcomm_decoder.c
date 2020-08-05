@@ -165,10 +165,11 @@ int main(void)
              &jd, &jdf);
 
         found_sat = 0;
+        double rawtime_increase = (rawtime + time_increase)*1000.0;
         for (int j = 0; j < num_sats; ++j)
         {
             parseLines(&tle, orbcomm_sats[j].line1, orbcomm_sats[j].line2);
-            getRVForDate(&tle, (rawtime + time_increase)*1000.0, eci, v);
+            getRVForDate(&tle, (long long) rawtime_increase, eci, v);
             eci2aer(jd+jdf, eci, lla, aer);
 
             if (aer[1] >= MIN_ELEVATION){
@@ -177,7 +178,7 @@ int main(void)
                 // calculate doppler by calculating the range to the satellite 1 second in
                 // the future and differencing the slant ranges.
                 double old_range = aer[2];
-                getRVForDate(&tle, (rawtime + time_increase)*1000.0 + 1000.0, eci, v);
+                getRVForDate(&tle, (long long) rawtime_increase + 1000, eci, v);
                 eci2aer(jd+jdf+1.0/(24.0*60.0*60.0), eci, lla, aer);
                 double delta_range =  aer[2] - old_range;
                 double doppler = C/(C+delta_range) * CENTER_FREQ - CENTER_FREQ;

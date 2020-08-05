@@ -161,7 +161,7 @@ long long parseEpoch(ElsetRec *rec, char *str)
     return epoch;
 }
 
-void getRVForDate(TLE *tle, long millisSince1970, double r[3], double v[3])
+void getRVForDate(TLE *tle, long long millisSince1970, double r[3], double v[3])
 {
     double diff = millisSince1970-tle->epoch;
     diff/=60000.0;

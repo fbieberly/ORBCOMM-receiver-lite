@@ -29,7 +29,7 @@ void parseLines(TLE *tle, char *line1, char *line2);
 
 long long parseEpoch(ElsetRec *rec, char *str);
 
-void getRVForDate(TLE *tle, long millisSince1970, double r[3], double v[3]);
+void getRVForDate(TLE *tle, long long millisSince1970, double r[3], double v[3]);
 
 void getRV(TLE *tle, double minutesAfterEpoch, double r[3], double v[3]);
 
