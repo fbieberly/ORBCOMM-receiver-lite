@@ -8,11 +8,11 @@
 #include <math.h>
 #include <time.h>
 
-// headers from someone else
+// headers from somewhere else
 #include <liquid/liquid.h>
 #include "TLE.h"
 
-// Files I made
+// local headers
 #include "orbcomm_db.h"
 #include "eci2aer.h"
 #include "../config.h"
@@ -40,17 +40,17 @@ uint16_t fletcher16( uint8_t *data, int count ){
 int main(void)
 {
     FILE *tle_file = NULL;
-    double lla[] = {OBS_LAT, OBS_LON, OBS_ALT};
     time_t rawtime;
     time_t old_rawtime = 0.0;;
     double time_increase = 0.0;
+    double lla[] = {OBS_LAT, OBS_LON, OBS_ALT};
 
     struct tm * ptm;
     double jd, jdf;
     int hour_daylight_savings;
 
     int num_sats = sizeof(orbcomm_sats)/sizeof(orbcomm_sats[0]);
-    printf("Len of orbcomm_sats: %d\n", num_sats);
+    fprintf(stdout, "Len of orbcomm_sats: %d\n", num_sats);
 
     // Open TLE file and fill in data into struct
     tle_file = fopen("./orbcomm.txt","r");
@@ -77,13 +77,14 @@ int main(void)
     int chunk_size = 250 * 48;
     uint8_t *data_buffer = (uint8_t *) malloc(chunk_size * sizeof(float));
 
-    // decimating LPF parameters
+    // LPF parameters
     float fc = 19200.0/SAMPLE_RATE;
     float As = 40.0f;
     float mu = 0.0f;
     unsigned int lpf_h_len = estimate_req_filter_len(fc, As);
 
-    float lpf_h[lpf_h_len];                   // filter coefficients
+    // Create complex low pass filter coefficients
+    float lpf_h[lpf_h_len];
     liquid_firdes_kaiser(lpf_h_len, fc, As, mu, lpf_h);
     float complex bb_bpf_h[lpf_h_len];
     float complex mixed_bpf_h[lpf_h_len];
@@ -91,6 +92,8 @@ int main(void)
     {
         bb_bpf_h[i] = lpf_h[i] + lpf_h[i]*_Complex_I;
     }
+
+    // this nco will be used to mix the low pass filter
     nco_crcf filt_nco_q = nco_crcf_create(LIQUID_VCO);
 
     // RRC pulse shape filter parameters
@@ -105,11 +108,11 @@ int main(void)
     {
         for (int j = 0; j < 2; ++j)
         {
-            // NCO
+            // NCO for fine frequency adjustments
             orbcomm_sats[i].decoder[j].nco_q = nco_crcf_create(LIQUID_VCO);
             nco_crcf_reset(orbcomm_sats[i].decoder[j].nco_q);
 
-            // Decimating BPF
+            // Decimating BPF created by complex mixing low pass filter
             float freq_shift = (orbcomm_sats[i].channel[j] - CENTER_FREQ)/SAMPLE_RATE;
             nco_crcf_set_phase(filt_nco_q, 0.0f);
             nco_crcf_set_frequency(filt_nco_q, freq_shift*2*M_PI);
@@ -124,8 +127,10 @@ int main(void)
                                                                          LIQUID_MODEM_QPSK);
         }
     }
+    // don't need this nco anymore
     nco_crcf_destroy(filt_nco_q);
 
+    // buffers to hold temporary data.
     float complex samples[2*chunk_size];
     float complex filtered_samples[2*chunk_size];
     float complex bb_decim_samples[chunk_size/2/DECIM];
@@ -143,15 +148,14 @@ int main(void)
     int sample_stop = 0;
     int total_samples = 0;
     uint8_t found_sat = 0;
-    clock_t begin = clock();
 
     while (1)
     {
         time ( &rawtime );
-
         if (rawtime != old_rawtime){
             old_rawtime = rawtime;
             time_increase = 0.0;
+            fprintf(stdout, "Timestamp: %ld\n", rawtime);
         }
         ptm = gmtime(&rawtime);
 
@@ -165,7 +169,7 @@ int main(void)
              &jd, &jdf);
 
         found_sat = 0;
-        double rawtime_increase = ((float)rawtime + time_increase)*1000.0;
+        double rawtime_increase = ((double) rawtime + time_increase)*1000.0;
         for (int j = 0; j < num_sats; ++j)
         {
             parseLines(&tle, orbcomm_sats[j].line1, orbcomm_sats[j].line2);
@@ -183,11 +187,11 @@ int main(void)
                 double delta_range =  aer[2] - old_range;
                 double doppler = C/(C+delta_range) * CENTER_FREQ - CENTER_FREQ;
                 orbcomm_sats[j].doppler = doppler;
-                // printf("AER: %f %f %f\n", aer[0], aer[1], aer[2]);
-                // printf("Relative range rate: %6.1f m/s\n", delta_range);
+                // fprintf(stdout, "AER: %f %f %f\n", aer[0], aer[1], aer[2]);
+                // fprintf(stdout, "Relative range rate: %6.1f m/s\n", delta_range);
 
                 if (orbcomm_sats[j].overhead == 0){
-                    printf("New Satellite %s, Elevation: %4.1f, Doppler: %6.1f Hz\n", orbcomm_sats[j].sat_name, aer[1], doppler);
+                    fprintf(stdout, "New Satellite %s, Elevation: %4.1f, Doppler: %6.1f Hz\n", orbcomm_sats[j].sat_name, aer[1], doppler);
                     orbcomm_sats[j].overhead = 1;
 
                     for (int k = 0; k < 2; ++k)
@@ -204,7 +208,7 @@ int main(void)
                 }
             } else {
                 if (orbcomm_sats[j].overhead == 1){
-                    printf("Satellite %s now below horizon.\n", orbcomm_sats[j].sat_name);
+                    fprintf(stdout, "Satellite %s now below horizon.\n", orbcomm_sats[j].sat_name);
                     // for (int k = 0; k < 2; ++k){
                     //     nco_crcf_destroy(orbcomm_sats[j].decoder[k].nco_q);
                     //     firdecim_cccf_destroy(orbcomm_sats[j].decoder[k].firdecim_q);
@@ -218,7 +222,7 @@ int main(void)
         // Read samples in from STDIN
         int num_samps = read(STDIN_FILENO, data_buffer, chunk_size * sizeof(float));
         // if (num_samps <= 10) { break; }
-        time_increase += (float) num_samps / SAMPLE_RATE;
+        time_increase += (float) num_samps / 8 / SAMPLE_RATE;
 
         float * buff_ptr = (float *) data_buffer;
         for (int j = 0; j < num_samps/4; ++j)
@@ -338,29 +342,39 @@ int main(void)
                             orbcomm_sats[satnum].decoder[channel_num].offset_search = 0;
                             orbcomm_sats[satnum].decoder[channel_num].bad_packet_count = 0;
 
-                            printf("%s, ", orbcomm_sats[satnum].sat_name);
-                            printf("Chan: %d, ", channel_num);
+                            fprintf(stdout, "%s, ", orbcomm_sats[satnum].sat_name);
+                            fprintf(stdout, "Chan: %d, ", channel_num);
                             for (int k = 0; k < packet_len; ++k){
-                                printf("%02x", packet[k]);
+                                fprintf(stdout, "%02x", packet[k]);
                             }
-                            printf("\n");
+                            fprintf(stdout, "\n");
                             bits_start += packet_len*8;
                         } else {
                             if (orbcomm_sats[satnum].decoder[channel_num].offset_search == 0){
                                 orbcomm_sats[satnum].decoder[channel_num].bad_packet_count += 1;
                                 bits_start += packet_len*8;
-                                printf("%s, ", orbcomm_sats[satnum].sat_name);
-                                printf("Chan: %d, ", channel_num);
+                                fprintf(stdout, "%s, ", orbcomm_sats[satnum].sat_name);
+                                fprintf(stdout, "Chan: %d, ", channel_num);
                                 for (int k = 0; k < packet_len; ++k){
-                                    printf("%02x", packet[k]);
+                                    fprintf(stdout, "%02x", packet[k]);
                                 }
-                                printf(" ### \n");
+                                fprintf(stdout, " ### \n");
                             }
                         }
 
-                        if (orbcomm_sats[satnum].decoder[channel_num].offset_search == 1) { bits_start++; }
                         if (orbcomm_sats[satnum].decoder[channel_num].offset_search == 0 && orbcomm_sats[satnum].decoder[channel_num].bad_packet_count >= 4){
                             orbcomm_sats[satnum].decoder[channel_num].offset_search = 1;
+                        }
+                        if (orbcomm_sats[satnum].decoder[channel_num].offset_search == 1) {
+                            orbcomm_sats[satnum].decoder[channel_num].bad_packet_count++;
+                            bits_start++;
+
+                            // Reset the symtrack object in case it has lost timing/phase sync with the signal
+                            // This starts happening a lot near the horizon, but shouldn't be too costly.
+                            if (orbcomm_sats[satnum].decoder[channel_num].bad_packet_count > 2000){
+                                orbcomm_sats[satnum].decoder[channel_num].bad_packet_count = 0;
+                                symtrack_cccf_reset(orbcomm_sats[satnum].decoder[channel_num].symtrack_q);
+                            }
                         }
                     }
                     if (bits_start > 0){
@@ -386,7 +400,7 @@ int main(void)
             sleep(1);
         }
     }
-    printf("\n");
+    fprintf(stdout, "\n");
 
     for (int j = 0; j < num_sats; ++j)
     {
@@ -399,9 +413,6 @@ int main(void)
     }
 
     free(data_buffer);
-    // clock_t end = clock();
-    // double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    // printf("Time per sample: %.20lf\n", time_spent/(total_samples*2));
-    printf("Exiting.\n");
+    fprintf(stdout, "Exiting.\n");
     return 0;
 }
