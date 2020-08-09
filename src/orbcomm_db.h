@@ -10,7 +10,7 @@ typedef struct ORBCOMM_DECODER{
     int bits_start;
     int bits_stop;
     float complex last_symbol;
-    uint8_t bad_packet_count;
+    int bad_packet_count;
     uint8_t offset_search;
 } ORBCOMM_DECODER;
 
