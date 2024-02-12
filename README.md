@@ -33,7 +33,7 @@ I use [liquid-dsp] for the signal processing.
 
 ## Real-time decoding
 1. Update the orbcomm.txt TLE file from Celestrak.
-    1. Run: ```wget -N https://www.celestrak.com/NORAD/elements/orbcomm.txt``` in the ORBCOMM-receiver-lite folder.
+    1. Run: ```wget -N https://celestrak.org/NORAD/elements/gp.php?GROUP=orbcomm&FORMAT=tle``` in the ORBCOMM-receiver-lite folder.
     1. I included an old TLE file. It will probably just work, but update when you can.
 2. Update latitude, longitude, altitude and minimum horizon of your receiver in _config.h_
 3. Run ```rtl_sdr -s 1200000 -g 0 -f 137524000 - | ./decimator | ./orbcomm_decoder```
